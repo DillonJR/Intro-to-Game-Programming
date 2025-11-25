@@ -1,6 +1,8 @@
 @echo off
-set SDL2_INC=C:\msys64\mingw64\include
-set SDL2_LIB=C:\msys64\mingw64\lib
+
+REM Point to the SDL2 that vcpkg built for MinGW in your course starter repo
+set SDL2_INC=C:\Users\dillo\GitHub\CPSI-27703-Intro-to-Game-Programming-Fall-2025-Starter\build\win-mingw-debug\vcpkg_installed\x64-mingw-dynamic\include
+set SDL2_LIB=C:\Users\dillo\GitHub\CPSI-27703-Intro-to-Game-Programming-Fall-2025-Starter\build\win-mingw-debug\vcpkg_installed\x64-mingw-dynamic\lib
 
 echo Using SDL2 include: %SDL2_INC%
 echo Using SDL2 lib:     %SDL2_LIB%
