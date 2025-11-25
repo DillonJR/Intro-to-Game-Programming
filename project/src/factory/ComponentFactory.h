@@ -3,7 +3,7 @@
 #include <functional>
 #include <string>
 #include <SDL2/SDL.h>
-#include "../../tinyxml2.h"
+#include "tinyxml2.h"
 
 #include "../GameObject.h"
 #include "../components/BodyComponent.h"
