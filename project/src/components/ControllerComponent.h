@@ -1,27 +1,23 @@
 #pragma once
 #include "../Component.h"
 #include "../Input.h"
-#include "../components/BodyComponent.h"
 
 class ControllerComponent : public Component {
 public:
-    ControllerComponent(GameObject& parent, Input& i, float speed)
-        : Component(parent), input(i), speed(speed) {}
+    ControllerComponent(GameObject& parent, Input& i, float s)
+        : Component(parent), input(i), speed(s) {}
 
-    void update() override {
-        auto body = parent().get<BodyComponent>();
-        if (!body) return;
-
-        body->vx = 0;
-        body->vy = 0;
-
-        if (input.isHeld(SDL_SCANCODE_W)) body->vy -= speed;
-        if (input.isHeld(SDL_SCANCODE_S)) body->vy += speed;
-        if (input.isHeld(SDL_SCANCODE_A)) body->vx -= speed;
-        if (input.isHeld(SDL_SCANCODE_D)) body->vx += speed;
+    void update(float dt) override {
+        if (input.left)  m_parent.x -= speed * dt;
+        if (input.right) m_parent.x += speed * dt;
+        if (input.up)    m_parent.y -= speed * dt;
+        if (input.down)  m_parent.y += speed * dt;
     }
 
-    void draw() override {}
+    // REQUIRED: fix abstract class error
+    void draw() override {
+        // Controller does not draw anything
+    }
 
 private:
     Input& input;

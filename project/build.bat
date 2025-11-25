@@ -1,29 +1,46 @@
 @echo off
+setlocal enabledelayedexpansion
 
-REM Point to the SDL2 that vcpkg built for MinGW in your course starter repo
-set SDL2_INC=C:\Users\dillo\GitHub\CPSI-27703-Intro-to-Game-Programming-Fall-2025-Starter\build\win-mingw-debug\vcpkg_installed\x64-mingw-dynamic\include
-set SDL2_LIB=C:\Users\dillo\GitHub\CPSI-27703-Intro-to-Game-Programming-Fall-2025-Starter\build\win-mingw-debug\vcpkg_installed\x64-mingw-dynamic\lib
+echo Building...
 
-echo Using SDL2 include: %SDL2_INC%
-echo Using SDL2 lib:     %SDL2_LIB%
+REM --- SDL2 PATHS (your working vcpkg paths) ---
+set SDL_INCLUDE=C:\Users\dillo\GitHub\CPSI-27703-Intro-to-Game-Programming-Fall-2025-Starter\build\win-mingw-debug\vcpkg_installed\x64-mingw-dynamic\include
+set SDL_LIB=C:\Users\dillo\GitHub\CPSI-27703-Intro-to-Game-Programming-Fall-2025-Starter\build\win-mingw-debug\vcpkg_installed\x64-mingw-dynamic\lib
+
+echo Using SDL2 include: %SDL_INCLUDE%
+echo Using SDL2 lib:     %SDL_LIB%
 echo.
 
-g++ -std=c++17 ^
-  src/main.cpp ^
-  src/world/World.cpp ^
-  src/tinyxml2.cpp ^
-  -Isrc -Isrc/world -Isrc/components -Isrc/factory ^
-  -I"%SDL2_INC%" ^
-  -L"%SDL2_LIB%" ^
-  -lmingw32 -lSDL2main -lSDL2 ^
-  -o game.exe
+REM --- Gather all source files ---
+set SRC_FILES=
+for %%f in (src\*.cpp) do (
+    set SRC_FILES=!SRC_FILES! %%f
+)
 
-if errorlevel 1 (
+set OUT_EXE=game.exe
+
+REM --- Compile ---
+g++ -std=c++17 -Wall -Wextra -I"%SDL_INCLUDE%" ^
+    %SRC_FILES% ^
+    -L"%SDL_LIB%" ^
+    -lmingw32 ^
+    -lSDL2main ^
+    -lSDL2 ^
+    -static-libstdc++ -static-libgcc ^
+    -o %OUT_EXE%
+
+if %errorlevel% neq 0 (
     echo.
     echo Build FAILED.
-) else (
-    echo.
-    echo Build succeeded. Run: .\game.exe
+    pause
+    exit /b
 )
+
+echo.
+echo Build SUCCESS!
+echo Running %OUT_EXE%...
+echo.
+
+%OUT_EXE%
 
 pause

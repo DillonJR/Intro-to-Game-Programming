@@ -1,33 +1,17 @@
 #pragma once
 #include <SDL2/SDL.h>
-#include <unordered_map>
 
 class Input {
 public:
-    void beginFrame() {
-        keyPressed.clear();
-        keyReleased.clear();
+    void processEvent(const SDL_Event& e) {
+        if (e.type == SDL_KEYDOWN) keys[e.key.keysym.scancode] = true;
+        if (e.type == SDL_KEYUP) keys[e.key.keysym.scancode] = false;
     }
 
-    void handleEvent(const SDL_Event& e) {
-        if (e.type == SDL_KEYDOWN && !e.key.repeat) {
-            keyPressed[e.key.keysym.scancode] = true;
-            keyHeld[e.key.keysym.scancode] = true;
-        }
-
-        if (e.type == SDL_KEYUP) {
-            keyReleased[e.key.keysym.scancode] = true;
-            keyHeld[e.key.keysym.scancode] = false;
-        }
-    }
-
-    bool isHeld(SDL_Scancode key) const {
-        auto it = keyHeld.find(key);
-        return it != keyHeld.end() && it->second;
+    bool isHeld(SDL_Scancode scan) const {
+        return keys[scan];
     }
 
 private:
-    std::unordered_map<SDL_Scancode, bool> keyHeld;
-    std::unordered_map<SDL_Scancode, bool> keyPressed;
-    std::unordered_map<SDL_Scancode, bool> keyReleased;
+    bool keys[SDL_NUM_SCANCODES] = {};
 };

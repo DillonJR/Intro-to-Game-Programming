@@ -1,70 +1,90 @@
 #include <SDL2/SDL.h>
-#include "Input.h"
-#include "world/World.h"
-#include "factory/ComponentFactory.h"
 #include "tinyxml2.h"
-#include "DebugConfig.h"
 
-bool gDebugDraw = true; // enables debug rectangles
+#include "GameObject.h"
+#include "Input.h"
+#include "factory/ComponentFactory.h"
 
-int main() {
-    SDL_Init(SDL_INIT_VIDEO);
+int SDL_main(int argc, char** argv)
+{
+    // Init SDL
+    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+        SDL_Log("SDL_Init Error: %s", SDL_GetError());
+        return 1;
+    }
 
     SDL_Window* window = SDL_CreateWindow(
-        "Component Demo",
-        SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+        "Game",
+        SDL_WINDOWPOS_CENTERED,
+        SDL_WINDOWPOS_CENTERED,
         800, 600,
         SDL_WINDOW_SHOWN
     );
 
-    SDL_Renderer* renderer =
-        SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    if (!window) {
+        SDL_Log("CreateWindow Error: %s", SDL_GetError());
+        SDL_Quit();
+        return 1;
+    }
 
+    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    if (!renderer) {
+        SDL_Log("CreateRenderer Error: %s", SDL_GetError());
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+        return 1;
+    }
+
+    // Input
     Input input;
-    World world;
 
-    // Load XML
+    // TinyXML
     tinyxml2::XMLDocument doc;
-    doc.LoadFile("assets/xml/objects.xml");
+    if (doc.LoadFile("assets/xml/objects.xml") != tinyxml2::XML_SUCCESS) {
+        SDL_Log("Failed loading XML file.");
+    }
 
-    auto root = doc.RootElement();
+    auto* root = doc.FirstChildElement("Objects");
+    std::vector<std::unique_ptr<GameObject>> objects;
+
     ComponentFactory factory(renderer, input);
 
-    for (auto objElem = root->FirstChildElement("GameObject");
-         objElem != nullptr;
-         objElem = objElem->NextSiblingElement("GameObject"))
-    {
-        auto obj = std::make_unique<GameObject>();
-        factory.build(*obj, *objElem);
-        world.add(std::move(obj));
+    // Build objects from XML
+    if (root) {
+        for (auto* elem = root->FirstChildElement("Object");
+             elem != nullptr;
+             elem = elem->NextSiblingElement("Object"))
+        {
+            auto obj = std::make_unique<GameObject>();
+            factory.build(*obj, *elem);
+            objects.push_back(std::move(obj));
+        }
     }
 
     bool running = true;
-    SDL_Event e;
-
     while (running) {
-        input.beginFrame();
 
+        // Get inputs
+        SDL_Event e;
         while (SDL_PollEvent(&e)) {
-
             if (e.type == SDL_QUIT)
                 running = false;
 
-            if (e.type == SDL_KEYDOWN && !e.key.repeat) {
-                if (e.key.keysym.scancode == SDL_SCANCODE_F1) {
-                    gDebugDraw = !gDebugDraw;
-                }
-            }
-
-            input.handleEvent(e);
+            input.processEvent(e); // YOUR Input system
         }
 
-        world.update();
+        // Update objects
+        for (auto& obj : objects) {
+            obj->update();
+        }
 
+        // Draw
         SDL_SetRenderDrawColor(renderer, 20, 20, 20, 255);
         SDL_RenderClear(renderer);
 
-        world.draw();
+        for (auto& obj : objects) {
+            obj->draw();          // FIXED: draw() takes no parameters
+        }
 
         SDL_RenderPresent(renderer);
     }
@@ -72,5 +92,6 @@ int main() {
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
+
     return 0;
 }
