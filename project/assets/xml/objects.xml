@@ -1,0 +1,13 @@
+<Root>
+    <GameObject id="player">
+        <BodyComponent x="100" y="100" width="64" height="64" />
+        <SpriteComponent textureKey="player.png" />
+        <ControllerComponent speed="2.5" />
+    </GameObject>
+
+    <GameObject id="enemy">
+        <BodyComponent x="300" y="300" width="64" height="64" />
+        <SpriteComponent textureKey="enemy.png" />
+        <Behavior1Component />
+    </GameObject>
+</Root>
