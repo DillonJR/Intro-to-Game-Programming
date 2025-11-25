@@ -3,7 +3,7 @@
 #include "../components/BodyComponent.h"
 #include "../components/Behavior1Component.h"
 #include "../DebugConfig.h"
-#include <SDL.h>
+#include <SDL2/SDL.h>
 
 class SpriteComponent : public Component {
 public:

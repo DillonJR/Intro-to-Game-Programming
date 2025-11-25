@@ -1,11 +1,5 @@
 @echo off
-REM ==== EDIT THESE TWO LINES TO MATCH WHERE SDL2 IS INSTALLED ====
-REM Common MSYS2 default:
-REM   C:\msys64\mingw64\include\SDL2
-REM   C:\msys64\mingw64\lib
-REM Or your MinGW/SDL2 dev package paths.
-
-set SDL2_INC=C:\msys64\mingw64\include\SDL2
+set SDL2_INC=C:\msys64\mingw64\include
 set SDL2_LIB=C:\msys64\mingw64\lib
 
 echo Using SDL2 include: %SDL2_INC%
