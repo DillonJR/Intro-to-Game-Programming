@@ -18,6 +18,8 @@ public:
     void update() override {}
 
     void draw() override {
+        if (!texture) return; // Don't draw if texture failed to load
+
         auto body = parent().get<BodyComponent>();
         if (body) {
             SDL_Rect dst = { static_cast<int>(body->x()), static_cast<int>(body->y()), 64, 64 };
